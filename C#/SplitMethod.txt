@@ -1,0 +1,22 @@
+Split Method
+
+private static List<objt> Split(string stringSplit)
+{
+	var list = new List<listobj>();
+	var part = 1;
+	var offset = 0;
+
+	while (offset < stringSplit.Length)
+	{
+		var size = Math.Min(512, stringSplit.Length - offset);
+		list.Add(new PaymentRelatedData()
+		{
+			KeyName = "ListItem_" + part,
+			Value = stringSplit.Substring(offset, size),
+		});
+		offset += size;
+		part++;
+	}
+
+	return list;
+}
