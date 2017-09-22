@@ -12,7 +12,7 @@ namespace Pagador.Gateway.Transactional.Engine
                 Status = TransactionStatusEnum.PaymentConfirmed
             };
 
-            return SpecificationImplement.CapturedTransaction.IsSatisfiedBy(a);
+            return SpecificationImplement.PaymentConfirmed.IsSatisfiedBy(a);
         }
     }
 }
