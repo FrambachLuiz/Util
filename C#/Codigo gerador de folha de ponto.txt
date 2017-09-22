@@ -1,0 +1,26 @@
+using System;
+					
+public class Program
+{
+	public class Teste {
+	}
+	
+	public static void Main()
+	{
+		Random rnd = new Random();
+		
+		for(var i=0; i < 31; i++) {
+			var hour = rnd.Next(9, 11);
+			var minute = rnd.Next(0, 59);
+			var exitHour = hour + 9;
+			
+			var hour2 = hour.ToString().PadLeft(2, '0');
+			var minute2 = minute.ToString().PadLeft(2, '0');
+			var exitHour2 = (hour + 9).ToString().PadLeft(2, '0');
+			
+			
+			Console.WriteLine(string.Format("Das {0}:{1} às {2}:{1}", hour2, minute2, exitHour2, minute2));
+			Console.WriteLine("Das           às");
+		}
+	}
+}

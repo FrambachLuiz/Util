@@ -1,0 +1,22 @@
+using System;
+					
+public class Program
+{
+	public class Teste {
+	}
+	
+	public static void Main()
+	{
+		var mes = DateTime.Now.AddMonths(-1);
+
+		var primeiroDia = new DateTime(mes.Year, mes.Month, 1);
+		
+		for(int i = 0; i < DateTime.DaysInMonth(mes.Year, mes.Month); i++) {
+			var dataAtual = primeiroDia.AddDays(i);
+			
+			if (dataAtual.DayOfWeek != DayOfWeek.Sunday && dataAtual.DayOfWeek != DayOfWeek.Saturday)
+				Console.WriteLine(dataAtual.Day.ToString().PadLeft(2, '0') + "\n");
+		}
+
+	}
+}
