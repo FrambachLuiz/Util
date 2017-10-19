@@ -1,0 +1,30 @@
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum StatusEnum : byte
+    {
+        [EnumMember(Value = "AUTHORIZED")]
+        Authorized,
+
+        [EnumMember(Value = "DECLINED")]
+        Declined,
+
+        [EnumMember(Value = "CAPTURED")]
+        Captured,
+
+        [EnumMember(Value = "NOT_CAPTURED")]
+        NotCaptured,
+
+        [EnumMember(Value = "CANCELED")]
+        Canceled,
+
+        [EnumMember(Value = "PARTIAL_CANCELED")]
+        PartialCanceled,
+
+        [EnumMember(Value = "IN_ANALYSIS")]
+        InAnalysis,
+
+        [EnumMember(Value = "FAILURE")]
+        Failure,
+
+        [EnumMember(Value = "AWAITING_PAYMENT")]
+        AwaitingPayment
+    }
