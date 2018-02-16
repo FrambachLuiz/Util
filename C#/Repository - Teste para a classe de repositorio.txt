@@ -1,0 +1,56 @@
+using Braspag.CommonTypes.Enums;
+using FluentAssertions;
+using Pagador.Gateway.Domain;
+using Pagador.Gateway.Repositories.IntegrationTests.Helpers;
+using Pagador.Gateway.Repositories.Interfaces;
+using System;
+using System.Configuration;
+using System.Data.SqlClient;
+using Xunit;
+
+namespace Pagador.Gateway.Repositories.IntegrationTests.Repositories
+{
+    [Collection("DatabaseSetup")]
+    public class MerchantWalletConfigurationRepositoryTests : IDisposable
+    {
+        private readonly IMerchantWalletConfigurationRepository _repository;
+
+        public MerchantWalletConfigurationRepositoryTests()
+        {
+            _repository = new MerchantWalletConfigurationRepository();
+            DatabaseTestHelper.ExecuteScripts("MerchantWalletConfiguration\\MerchantWalletConfiguration_Init.sql");
+        }
+
+        public void Dispose()
+        {
+            DatabaseTestHelper.ExecuteScripts("MerchantWalletConfiguration\\MerchantWalletConfiguration_Clean.sql");
+        }
+
+        [Fact]
+        public void Create_ShouldCreateMerchantWalletConfiguration()
+        {
+            var merchantWalletConfiguration = new MerchantWalletConfiguration
+            {
+                Id = Guid.NewGuid(),
+                MerchantId = new Guid("94E5EA52-79B0-7DBA-1867-BE7B081EDD97"),
+                SharedKey = "TesteSharedKey",
+                PublicKey = "TestePublicKey",
+                ExpirationDate = DateTime.Now,
+                Type = WalletTypeEnum.AndroidPay
+            };
+
+            _repository.Create(merchantWalletConfiguration);
+
+            var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["PagadorWriteConnection"].ToString());
+            var reader = DatabaseTestHelper.GetReader(connection, "MerchantWalletConfiguration", "WalletConfigurationId", merchantWalletConfiguration.Id);
+            reader.Read().Should().BeTrue();
+
+            reader.GetGuid(reader.GetOrdinal("WalletConfigurationId")).Should().Be(merchantWalletConfiguration.Id);
+            reader.GetGuid(reader.GetOrdinal("MerchantId")).Should().Be(merchantWalletConfiguration.MerchantId);
+            reader.GetInt16(reader.GetOrdinal("WalletType")).Should().Be((short)merchantWalletConfiguration.Type);
+            reader.GetString(reader.GetOrdinal("PublicKey")).Should().Be(merchantWalletConfiguration.PublicKey);
+            reader.GetString(reader.GetOrdinal("SharedKey")).Should().Be(merchantWalletConfiguration.SharedKey);
+            reader.GetDateTime(reader.GetOrdinal("ExpirationDate")).Should().BeCloseTo(merchantWalletConfiguration.ExpirationDate.Value);
+        }
+    }
+}

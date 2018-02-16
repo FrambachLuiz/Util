@@ -1,0 +1,173 @@
+using Braspag.CommonTypes.Enums;
+using Pagador.Gateway.Domain;
+using Pagador.Gateway.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace Pagador.Gateway.Repositories
+{
+    public class MerchantWalletConfigurationRepository : IMerchantWalletConfigurationRepository
+    {
+        public void Create(MerchantWalletConfiguration merchantWalletConfiguration)
+        {
+            var connection = ConnectionFactory.CreateWriteConnection();
+
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                try
+                {
+                    connection.Open();
+
+                    command.CommandText =
+                        string.Concat("INSERT INTO [dbo].[MerchantWalletConfiguration]",
+                                      " ([WalletConfigurationId], [MerchantId], [WalletType], [PublicKey], [SharedKey], [ExpirationDate])",
+                                      " VALUES (@Id, @MerchantId, @WalletType, @PublicKey, @SharedKey, @ExpirationDate)");
+
+                    command.Parameters.Clear();
+                    command.Parameters.Add("@Id", SqlDbType.UniqueIdentifier).Value = merchantWalletConfiguration.Id;
+                    command.Parameters.Add("@MerchantId", SqlDbType.UniqueIdentifier).Value =
+                        merchantWalletConfiguration.MerchantId;
+                    command.Parameters.Add("@WalletType", SqlDbType.Int).Value = merchantWalletConfiguration.Type;
+                    command.Parameters.Add("@PublicKey", SqlDbType.VarChar).Value =
+                       string.IsNullOrEmpty(merchantWalletConfiguration.PublicKey) ? string.Empty : merchantWalletConfiguration.PublicKey;
+                    command.Parameters.Add("@SharedKey", SqlDbType.VarChar).Value =
+                        merchantWalletConfiguration.SharedKey;
+                    command.Parameters.Add("@ExpirationDate", SqlDbType.DateTime2).Value =
+                        merchantWalletConfiguration.ExpirationDate;
+
+                    command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    if (command.Connection.State != ConnectionState.Closed)
+                        command.Connection.Close();
+                }
+            }
+        }
+
+        public List<MerchantWalletConfiguration> GetByMerchantId(Guid merchantId)
+        {
+            var result = new List<MerchantWalletConfiguration>();
+
+            var connection = ConnectionFactory.CreateWriteConnection();
+
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                try
+                {
+                    connection.Open();
+
+                    command.CommandText = string.Concat(
+                        "SELECT [WalletConfigurationId], [MerchantId], [WalletType], [PublicKey], [SharedKey], [ExpirationDate]",
+                        "FROM [dbo].[MerchantWalletConfiguration] (NOLOCK) WHERE [MerchantId] = @MerchantId");
+
+                    command.Parameters.Clear();
+                    command.Parameters.Add("@MerchantId", SqlDbType.UniqueIdentifier).Value = merchantId;
+
+                    var reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var walletConfiguration = new MerchantWalletConfiguration();
+                            walletConfiguration.Id = reader.GetGuid(reader.GetOrdinal("WalletConfigurationId"));
+                            walletConfiguration.MerchantId = reader.GetGuid(reader.GetOrdinal("MerchantId"));
+                            walletConfiguration.Type = (WalletTypeEnum)reader.GetInt16(reader.GetOrdinal("WalletType"));
+                            walletConfiguration.PublicKey = reader.GetString(reader.GetOrdinal("PublicKey"));
+                            walletConfiguration.SharedKey = reader.GetString(reader.GetOrdinal("SharedKey"));
+                            walletConfiguration.ExpirationDate = reader.GetDateTime(reader.GetOrdinal("ExpirationDate"));
+
+                            result.Add(walletConfiguration);
+                        }
+                    }
+                }
+                finally
+                {
+                    if (command.Connection.State != ConnectionState.Closed)
+                        command.Connection.Close();
+                }
+
+                return result;
+            }
+        }
+
+        public int Delete(Guid id)
+        {
+            var connection = ConnectionFactory.CreateWriteConnection();
+
+            int rowsAffected;
+
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                try
+                {
+                    connection.Open();
+
+                    command.CommandText =
+                        string.Concat("DELETE FROM [dbo].[MerchantWalletConfiguration]",
+                                      "WHERE [WalletConfigurationId] = @WalletConfigurationId");
+
+                    command.Parameters.Clear();
+                    command.Parameters.Add("@WalletConfigurationId", SqlDbType.UniqueIdentifier).Value = id;
+
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    if (command.Connection.State != ConnectionState.Closed)
+                        command.Connection.Close();
+                }
+
+                return rowsAffected;
+            }
+        }
+
+        public int Update(MerchantWalletConfiguration merchantWalletConfiguration)
+        {
+            var connection = ConnectionFactory.CreateWriteConnection();
+
+            int rowsAffected;
+
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                try
+                {
+                    connection.Open();
+
+                    command.CommandText =
+                        string.Concat("UPDATE  [dbo].[MerchantWalletConfiguration] ",
+                            " [MerchantId] = @MerchantId,",
+                            " [WalletType] = @WalletType,",
+                            " [PublicKey] = @PublicKey,",
+                            " [SharedKey] = @SharedKey,",
+                            " [ExpirationDate] = @ExpirationDate)",
+                            " WHERE WalletConfigurationId = @Id");
+
+                    command.Parameters.Clear();
+                    command.Parameters.Add("@Id", SqlDbType.UniqueIdentifier).Value = merchantWalletConfiguration.Id;
+                    command.Parameters.Add("@MerchantId", SqlDbType.UniqueIdentifier).Value =
+                        merchantWalletConfiguration.MerchantId;
+                    command.Parameters.Add("@WalletType", SqlDbType.Int).Value = merchantWalletConfiguration.Type;
+                    command.Parameters.Add("@PublicKey", SqlDbType.VarChar).Value =
+                        string.IsNullOrEmpty(merchantWalletConfiguration.PublicKey) ? string.Empty : merchantWalletConfiguration.PublicKey;
+                    command.Parameters.Add("@SharedKey", SqlDbType.VarChar).Value =
+                        merchantWalletConfiguration.SharedKey;
+                    command.Parameters.Add("@ExpirationDate", SqlDbType.DateTime2).Value =
+                        merchantWalletConfiguration.ExpirationDate;
+
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    if (command.Connection.State != ConnectionState.Closed)
+                        command.Connection.Close();
+                }
+            }
+
+            return rowsAffected;
+        }
+    }
+}
