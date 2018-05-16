@@ -1,0 +1,55 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+					
+public class Program
+{
+	public class Teste
+    {
+        public string TesteName { get; set; }
+        public string TesteCode { get; set; }
+    }
+		
+	public class ErrorModel
+    {
+		public ErrorModel(string errorName , string errorCode){
+		
+			this.ErrorName = errorName;
+			this.ErrorCode = errorCode;
+		}
+		
+        public string ErrorName { get; set; }
+        public string ErrorCode { get; set; }
+    }
+	
+	public static void Main()
+	{		
+		
+		var entrada = new List<Teste>{
+			new Teste{ TesteName = "teste1" , TesteCode = "1" },
+			new Teste{ TesteName = "teste2" , TesteCode = "2" },
+			new Teste{ TesteName = "teste3" , TesteCode = "3" }
+		};
+		
+		var errorList = new List<string>{
+		  "1",
+		  "2"	
+		};
+		
+		
+		if (entrada.Any(x => errorList.Contains(x.TesteCode))) // Comparando se na entrada, contem algum erro
+		{ 
+
+			var resposta = entrada.Where(x => errorList.Contains(x.TesteCode)).Select(x => new ErrorModel(x.TesteName, x.TesteCode)).ToList(); // Retornando como modelo de erro, os dados da entrada que contem erro.
+			
+			foreach (var itens in resposta)
+            {
+                Console.WriteLine(itens.ErrorCode + "/" + itens.ErrorName); 	
+            }
+						
+		}
+				
+		Console.WriteLine("falhou"); 
+		
+	}		
+}
