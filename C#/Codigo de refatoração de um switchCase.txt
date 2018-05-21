@@ -1,0 +1,26 @@
+       public List<ErrorCodeModel> ConvertByPaymentResponse(BasePaymentResponse gatewayResponsePayments)
+        {
+            var errorList = new List<ErrorCodeModel>();
+
+            Dictionary<OperationStatusEnum, Action> operations = new Dictionary<OperationStatusEnum, Action>
+            {
+                { OperationStatusEnum.AffiliationNotFound, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.AffiliationNotFound)) },
+                { OperationStatusEnum.CouldNotGetCreditCard, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.CouldNotGetCreditCard)) },
+                { OperationStatusEnum.CouldNotAntifraud, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.AntifraudNotConfigured)) },
+                { OperationStatusEnum.CartaoProtegidoIsNotEnabled, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.CartaoProtegidoNotConfigured)) },
+                { OperationStatusEnum.PaymentMethodIsNotEnabled, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.PaymentMethodIsNotEnabled)) },
+                { OperationStatusEnum.CouldNotFindPaymentToken, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.CouldNotFindPaymentToken)) },
+                { OperationStatusEnum.MerchantIdJustClickNotFound, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.MerchantIdJustClickNotFound)) },
+                { OperationStatusEnum.BrandNotSupported, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.BrandNotSupported)) },
+                { OperationStatusEnum.CardOptionsNotSupported, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.PaymentMethodDoesNotSuportOptions, gatewayResponsePayments.ReturnMessage)) },
+                { OperationStatusEnum.BoletoRequiredDataNotSupported, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.BoletoRequiredDataNotSupported, gatewayResponsePayments.ReturnMessage)) },
+                { OperationStatusEnum.WalletKeyIsInvalid, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.WalletKeyIsInvalid)) },
+                { OperationStatusEnum.MerchantWalletConfigurationNotFound, () => errorList.Add(CreateErrorCodeModel(ApiErrorEnum.MerchantWalletConfigurationNotFound)) },
+                { OperationStatusEnum.ValidationError, () => FillValidationErrorList(gatewayResponsePayments.ValidationErrors, errorList) }
+            };
+
+            if (operations.ContainsKey(gatewayResponsePayments.OperationStatus))
+                operations[gatewayResponsePayments.OperationStatus].Invoke();
+
+            return errorList;
+        }
