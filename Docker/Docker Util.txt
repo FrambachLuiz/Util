@@ -1,0 +1,12 @@
+Boas Praticas:
+- Cada aplicação devera ter seu proprio DockerFile
+
+Comandos:
+
+- build do docker -> docker build [parametro] [app] [path] 
+- Listando imagens -> docker ps
+- Sair do container -> ctrl p + ctrl q
+- Matar container -> docker kill/stop [name/Id]
+- Port foward -> -p [PortaAtual]:[PortaDoContainer]
+- Rodar em background -> -d
+- Rodar em Modo Interativo -> -it
