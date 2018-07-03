@@ -10,3 +10,4 @@ Comandos:
 - Port foward -> -p [PortaAtual]:[PortaDoContainer]
 - Rodar em background -> -d
 - Rodar em Modo Interativo -> -it
+- Passando valores para variaveis de ambiente -> -v [Nome da Variavel] [valor da variavel]
